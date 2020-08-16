@@ -53,11 +53,13 @@ layout(push_constant) uniform Push
 	uint FrameCount;
 	float use_frame;
 	float curvature;
+	float wiggle_toggle;
 } params;
 
 #pragma parameter use_frame "Use Frame Image" 0.0 0.0 1.0 1.0
 #define use_frame params.use_frame
 #pragma parameter curvature "Curvature" 2.0 0.0001 4.0 0.25
+#pragma parameter wiggle_toggle "Interference" 0.0 0.0 1.0 1.0
 
 #define gl_FragCoord (vTexCoord.xy * params.OutputSize.xy)
 #define backbuffer accum1
@@ -126,7 +128,7 @@ float rand(vec2 co)
 void main()
 {
    // stop time variable so the screen doesn't wiggle
-   float time = 1.0;
+   float time = mod(params.FrameCount, 849.0) *36.;
     vec2 uv = vTexCoord.xy;
     /* Curve */
     vec2 curved_uv = mix( curve( uv ), uv, 0.4 );
@@ -137,7 +139,7 @@ void main()
 		
     /* Main color, Bleed */
     vec3 col;
-    float x =  sin(0.1*time+curved_uv.y*13.0)*sin(0.23*time+curved_uv.y*19.0)*sin(0.3+0.11*time+curved_uv.y*23.0)*0.0012;
+    float x = params.wiggle_toggle* sin(0.1*time+curved_uv.y*13.0)*sin(0.23*time+curved_uv.y*19.0)*sin(0.3+0.11*time+curved_uv.y*23.0)*0.0012;
     float o =sin(gl_FragCoord.y*1.5)/resolution.x;
     x+=o*0.25;
    // make time do something again
