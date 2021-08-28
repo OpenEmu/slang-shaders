@@ -3,6 +3,7 @@
 // NTSC-Adaptive
 // based on Themaister's NTSC shader
 
+
 layout(std140, set = 0, binding = 0) uniform UBO
 {
    mat4 MVP;
@@ -10,12 +11,14 @@ layout(std140, set = 0, binding = 0) uniform UBO
    vec4 OriginalSize;
    vec4 SourceSize;
    float linearize;
+   float ntsc_scale;
+   float ntsc_phase;
+   float auto_res;
 } global;
 
-#pragma parameter linearize "Linearize Output Gamma" 0.0 0.0 1.0 1.0
-
-#define fetch_offset(offset, one_x) \
-   texture(Source, vTexCoord + vec2((offset) * (one_x), 0.0)).xyz
+#pragma parameter ntsc_scale "NTSC Resolution Scaling" 1.0 0.20 3.0 0.05
+#pragma parameter ntsc_phase "NTSC Phase: Auto | 2 phase | 3 phase" 1.0 1.0 3.0 1.0
+#pragma parameter linearize "NTSC Linearize Output Gamma" 0.0 0.0 1.0 1.0 
 
 #pragma stage vertex
 layout(location = 0) in vec4 Position;
@@ -32,6 +35,11 @@ void main()
 layout(location = 0) in vec2 vTexCoord;
 layout(location = 0) out vec4 FragColor;
 layout(set = 0, binding = 2) uniform sampler2D Source;
+
+vec3 fetch_offset(float offset, float one_x)
+{
+   return texture(Source, vTexCoord + vec2((offset) * (one_x), 0.0)).xyz;
+}
 
 const mat3 yiq2rgb_mat = mat3(
    1.0, 0.956, 0.6210,
@@ -182,20 +190,79 @@ const float chroma_filter_3_phase[25] = float[25](
 
 void main()
 {
-   float phase = (global.OriginalSize.x > 300.0) ? 2.0 : 3.0;
-   float one_x = global.SourceSize.z;
+   float res = global.ntsc_scale;
+   float OriginalSize = global.OriginalSize.x; 
+   float one_x = global.SourceSize.z / res;
    vec3 signal = vec3(0.0);
+   float phase = (global.ntsc_phase < 1.5) ? ((OriginalSize > 300.0) ? 2.0 : 3.0) : ((global.ntsc_phase > 2.5) ? 3.0 : 2.0);
 
    if(phase < 2.5)
    {
-      for (int i = 0; i < TAPS_2_phase; i++)
-      {
-         float offset = float(i);
-
-         vec3 sums = fetch_offset(offset - float(TAPS_2_phase), one_x) +
-            fetch_offset(float(TAPS_2_phase) - offset, one_x);
-         signal += sums * vec3(luma_filter_2_phase[i], chroma_filter_2_phase[i], chroma_filter_2_phase[i]);
-      }
+      vec3 sums = fetch_offset(0.0 - 32.0, one_x) + fetch_offset(32.0 - 0.0, one_x);
+      signal += sums * vec3(luma_filter_2_phase[0], chroma_filter_2_phase[0], chroma_filter_2_phase[0]);
+      sums = fetch_offset(1.0 - 32.0, one_x) + fetch_offset(32.0 - 1.0, one_x);
+      signal += sums * vec3(luma_filter_2_phase[1], chroma_filter_2_phase[1], chroma_filter_2_phase[1]);
+      sums = fetch_offset(2.0 - 32.0, one_x) + fetch_offset(32.0 - 2.0, one_x);
+      signal += sums * vec3(luma_filter_2_phase[2], chroma_filter_2_phase[2], chroma_filter_2_phase[2]);
+      sums = fetch_offset(3.0 - 32.0, one_x) + fetch_offset(32.0 - 3.0, one_x);
+      signal += sums * vec3(luma_filter_2_phase[3], chroma_filter_2_phase[3], chroma_filter_2_phase[3]);
+      sums = fetch_offset(4.0 - 32.0, one_x) + fetch_offset(32.0 - 4.0, one_x);
+      signal += sums * vec3(luma_filter_2_phase[4], chroma_filter_2_phase[4], chroma_filter_2_phase[4]);
+      sums = fetch_offset(5.0 - 32.0, one_x) + fetch_offset(32.0 - 5.0, one_x);
+      signal += sums * vec3(luma_filter_2_phase[5], chroma_filter_2_phase[5], chroma_filter_2_phase[5]);
+      sums = fetch_offset(6.0 - 32.0, one_x) + fetch_offset(32.0 - 6.0, one_x);
+      signal += sums * vec3(luma_filter_2_phase[6], chroma_filter_2_phase[6], chroma_filter_2_phase[6]);
+      sums = fetch_offset(7.0 - 32.0, one_x) + fetch_offset(32.0 - 7.0, one_x);
+      signal += sums * vec3(luma_filter_2_phase[7], chroma_filter_2_phase[7], chroma_filter_2_phase[7]);
+      sums = fetch_offset(8.0 - 32.0, one_x) + fetch_offset(32.0 - 8.0, one_x);
+      signal += sums * vec3(luma_filter_2_phase[8], chroma_filter_2_phase[8], chroma_filter_2_phase[8]);
+      sums = fetch_offset(9.0 - 32.0, one_x) + fetch_offset(32.0 - 9.0, one_x);
+      signal += sums * vec3(luma_filter_2_phase[9], chroma_filter_2_phase[9], chroma_filter_2_phase[9]);
+      sums = fetch_offset(10.0 - 32.0, one_x) + fetch_offset(32.0 - 10.0, one_x);
+      signal += sums * vec3(luma_filter_2_phase[10], chroma_filter_2_phase[10], chroma_filter_2_phase[10]);
+      sums = fetch_offset(11.0 - 32.0, one_x) + fetch_offset(32.0 - 11.0, one_x);
+      signal += sums * vec3(luma_filter_2_phase[11], chroma_filter_2_phase[11], chroma_filter_2_phase[11]);
+      sums = fetch_offset(12.0 - 32.0, one_x) + fetch_offset(32.0 - 12.0, one_x);
+      signal += sums * vec3(luma_filter_2_phase[12], chroma_filter_2_phase[12], chroma_filter_2_phase[12]);
+      sums = fetch_offset(13.0 - 32.0, one_x) + fetch_offset(32.0 - 13.0, one_x);
+      signal += sums * vec3(luma_filter_2_phase[13], chroma_filter_2_phase[13], chroma_filter_2_phase[13]);
+      sums = fetch_offset(14.0 - 32.0, one_x) + fetch_offset(32.0 - 14.0, one_x);
+      signal += sums * vec3(luma_filter_2_phase[14], chroma_filter_2_phase[14], chroma_filter_2_phase[14]);
+      sums = fetch_offset(15.0 - 32.0, one_x) + fetch_offset(32.0 - 15.0, one_x);
+      signal += sums * vec3(luma_filter_2_phase[15], chroma_filter_2_phase[15], chroma_filter_2_phase[15]);
+      sums = fetch_offset(16.0 - 32.0, one_x) + fetch_offset(32.0 - 16.0, one_x);
+      signal += sums * vec3(luma_filter_2_phase[16], chroma_filter_2_phase[16], chroma_filter_2_phase[16]);
+      sums = fetch_offset(17.0 - 32.0, one_x) + fetch_offset(32.0 - 17.0, one_x);
+      signal += sums * vec3(luma_filter_2_phase[17], chroma_filter_2_phase[17], chroma_filter_2_phase[17]);
+      sums = fetch_offset(18.0 - 32.0, one_x) + fetch_offset(32.0 - 18.0, one_x);
+      signal += sums * vec3(luma_filter_2_phase[18], chroma_filter_2_phase[18], chroma_filter_2_phase[18]);
+      sums = fetch_offset(19.0 - 32.0, one_x) + fetch_offset(32.0 - 19.0, one_x);
+      signal += sums * vec3(luma_filter_2_phase[19], chroma_filter_2_phase[19], chroma_filter_2_phase[19]);
+      sums = fetch_offset(20.0 - 32.0, one_x) + fetch_offset(32.0 - 20.0, one_x);
+      signal += sums * vec3(luma_filter_2_phase[20], chroma_filter_2_phase[20], chroma_filter_2_phase[20]);
+      sums = fetch_offset(21.0 - 32.0, one_x) + fetch_offset(32.0 - 21.0, one_x);
+      signal += sums * vec3(luma_filter_2_phase[21], chroma_filter_2_phase[21], chroma_filter_2_phase[21]);
+      sums = fetch_offset(22.0 - 32.0, one_x) + fetch_offset(32.0 - 22.0, one_x);
+      signal += sums * vec3(luma_filter_2_phase[22], chroma_filter_2_phase[22], chroma_filter_2_phase[22]);
+      sums = fetch_offset(23.0 - 32.0, one_x) + fetch_offset(32.0 - 23.0, one_x);
+      signal += sums * vec3(luma_filter_2_phase[23], chroma_filter_2_phase[23], chroma_filter_2_phase[23]);
+      sums = fetch_offset(24.0 - 32.0, one_x) + fetch_offset(32.0 - 24.0, one_x);
+      signal += sums * vec3(luma_filter_2_phase[24], chroma_filter_2_phase[24], chroma_filter_2_phase[24]);
+      sums = fetch_offset(25.0 - 32.0, one_x) + fetch_offset(32.0 - 25.0, one_x);
+      signal += sums * vec3(luma_filter_2_phase[25], chroma_filter_2_phase[25], chroma_filter_2_phase[25]);
+      sums = fetch_offset(26.0 - 32.0, one_x) + fetch_offset(32.0 - 26.0, one_x);
+      signal += sums * vec3(luma_filter_2_phase[26], chroma_filter_2_phase[26], chroma_filter_2_phase[26]);
+      sums = fetch_offset(27.0 - 32.0, one_x) + fetch_offset(32.0 - 27.0, one_x);
+      signal += sums * vec3(luma_filter_2_phase[27], chroma_filter_2_phase[27], chroma_filter_2_phase[27]);
+      sums = fetch_offset(28.0 - 32.0, one_x) + fetch_offset(32.0 - 28.0, one_x);
+      signal += sums * vec3(luma_filter_2_phase[28], chroma_filter_2_phase[28], chroma_filter_2_phase[28]);
+      sums = fetch_offset(29.0 - 32.0, one_x) + fetch_offset(32.0 - 29.0, one_x);
+      signal += sums * vec3(luma_filter_2_phase[29], chroma_filter_2_phase[29], chroma_filter_2_phase[29]);
+      sums = fetch_offset(30.0 - 32.0, one_x) + fetch_offset(32.0 - 30.0, one_x);
+      signal += sums * vec3(luma_filter_2_phase[30], chroma_filter_2_phase[30], chroma_filter_2_phase[30]);
+      sums = fetch_offset(31.0 - 32.0, one_x) + fetch_offset(32.0 - 31.0, one_x);
+      signal += sums * vec3(luma_filter_2_phase[31], chroma_filter_2_phase[31], chroma_filter_2_phase[31]);
+      
       signal += texture(Source, vTexCoord).xyz *
          vec3(luma_filter_2_phase[TAPS_2_phase], chroma_filter_2_phase[TAPS_2_phase], chroma_filter_2_phase[TAPS_2_phase]);
    }
@@ -217,4 +284,4 @@ void main()
    FragColor = vec4(rgb, 1.0);
    if(global.linearize < 0.5) return;
    else FragColor = pow(FragColor, vec4(2.2));
-} 
+}  

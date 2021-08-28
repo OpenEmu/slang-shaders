@@ -95,17 +95,17 @@ void main()
 	float YY = Y*Y;
 	
 #if defined(FINEMASK) 
-	float whichmask = fract( gl_FragCoord.x*-0.4999);
+	float whichmask = fract(floor(vTexCoord.x*params.OutputSize.x*-0.4999));
 	float mask = 1.0 + float(whichmask < 0.5) * -MASK_DARK;
 #else
-	float whichmask = fract(gl_FragCoord.x * -0.3333);
+	float whichmask = fract(floor(vTexCoord.x*params.OutputSize.x)*-0.3333));
 	float mask = 1.0 + float(whichmask <= 0.33333) * -MASK_DARK;
 #endif
 	vec3 colour = texture(Source, p).rgb;
-	
+
 	float scanLineWeight = (BRIGHTBOOST - LOWLUMSCAN*(Y - 2.05*YY));
-	float scanLineWeightB = 1.0 - HILUMSCAN*(YY-2.8*YY*Y);	
-	
+	float scanLineWeightB = 1.0 - HILUMSCAN*(YY-2.8*YY*Y);
+
 #if defined(BLACK_OUT_BORDER)
 	colour.rgb*=float(tc.x > 0.0)*float(tc.y > 0.0); //why doesn't the driver do the right thing?
 #endif

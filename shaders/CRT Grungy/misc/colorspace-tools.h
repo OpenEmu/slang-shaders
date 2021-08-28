@@ -64,6 +64,32 @@ vec3 srgb_linear(vec3 x) {
 #endif
 }
 
+vec3 linear_to_sRGB(vec3 color, float gamma){
+
+    color = clamp(color, 0.0, 1.0);
+    color.r = (color.r <= 0.00313066844250063) ?
+    color.r * 12.92 : 1.055 * pow(color.r, 1.0 / gamma) - 0.055;
+    color.g = (color.g <= 0.00313066844250063) ?
+    color.g * 12.92 : 1.055 * pow(color.g, 1.0 / gamma) - 0.055;
+    color.b = (color.b <= 0.00313066844250063) ?
+    color.b * 12.92 : 1.055 * pow(color.b, 1.0 / gamma) - 0.055;
+
+    return color.rgb;
+}
+
+vec3 sRGB_to_linear(vec3 color, float gamma){
+
+    color = clamp(color, 0.0, 1.0);
+    color.r = (color.r <= 0.04045) ?
+    color.r / 12.92 : pow((color.r + 0.055) / (1.055), gamma);
+    color.g = (color.g <= 0.04045) ?
+    color.g / 12.92 : pow((color.g + 0.055) / (1.055), gamma);
+    color.b = (color.b <= 0.04045) ?
+    color.b / 12.92 : pow((color.b + 0.055) / (1.055), gamma);
+
+    return color.rgb;
+}
+
 //Conversion matrices
 vec3 RGBtoXYZ(vec3 RGB)
   {
