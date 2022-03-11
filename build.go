@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	"log"
 	"os"
 	"path/filepath"
 
@@ -9,10 +9,11 @@ import (
 )
 
 func main() {
+	log.SetFlags(0)
+
 	matches, err := filepath.Glob("shaders/*")
 	if err != nil {
-		fmt.Printf("error glob: %v\n", err)
-		os.Exit(1)
+		log.Fatalf("Error glob: %v", err)
 	}
 
 	var files []string
@@ -24,14 +25,16 @@ func main() {
 		files = append(files, m)
 	}
 
-	os.MkdirAll("_build", os.ModePerm)
+	if err := os.MkdirAll("_build", os.ModePerm); err != nil {
+		log.Fatalf("Error creating _build directory: %v", err)
+	}
 
 	for _, fi := range files {
 		name := filepath.Join("_build", filepath.Base(fi)+".oeshaderplugin")
-		fmt.Printf("building shader %q to %q\n", fi, name)
+		log.Printf("Building shader %q to %q\n", fi, name)
 		err := zip.ArchiveFile(fi+string(filepath.Separator), name, nil)
 		if err != nil {
-			// boo
+			log.Fatalf("Error archiving %s: %v", name, err)
 		}
 	}
 }
