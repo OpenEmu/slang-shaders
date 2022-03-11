@@ -1,5 +1,3 @@
-#version 450
-
 /*
     zfast_crt_standard - A simple, fast CRT shader.
 
@@ -52,10 +50,6 @@ layout(std140, set = 0, binding = 0) uniform UBO
 //#define FRAGMENT
 //#define VERTEX
 
-//This can't be an option without slowing the shader down
-//Comment this out for a coarser 3 pixel mask...which is currently broken
-//on SNES Classic Edition due to Mali 400 gpu precision
-#define FINEMASK
 //Some drivers don't return black with texture coordinates out of bounds
 //SNES Classic is too slow to black these areas out when using fullscreen
 //overlays.  But you can uncomment the below to black them out if necessary
@@ -98,14 +92,14 @@ void main()
 	float whichmask = fract(floor(vTexCoord.x*params.OutputSize.x*-0.4999));
 	float mask = 1.0 + float(whichmask < 0.5) * -MASK_DARK;
 #else
-	float whichmask = fract(floor(vTexCoord.x*params.OutputSize.x)*-0.3333));
+	float whichmask = fract(floor(vTexCoord.x*params.OutputSize.x)*-0.3333);
 	float mask = 1.0 + float(whichmask <= 0.33333) * -MASK_DARK;
 #endif
 	vec3 colour = texture(Source, p).rgb;
-
+	
 	float scanLineWeight = (BRIGHTBOOST - LOWLUMSCAN*(Y - 2.05*YY));
-	float scanLineWeightB = 1.0 - HILUMSCAN*(YY-2.8*YY*Y);
-
+	float scanLineWeightB = 1.0 - HILUMSCAN*(YY-2.8*YY*Y);	
+	
 #if defined(BLACK_OUT_BORDER)
 	colour.rgb*=float(tc.x > 0.0)*float(tc.y > 0.0); //why doesn't the driver do the right thing?
 #endif
