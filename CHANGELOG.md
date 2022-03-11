@@ -6,6 +6,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- Added FidelityFX Super Res
+  - AMD FidelityFX Super Resolution shader
+-Added AMD FidelityFX Super Resolution shader with Subpixel Morphological Antialiasing
+  - [What is Subpixel Morphological Antialiasing?](http://www.iryoku.com/smaa/)
+-Added Technicolor film shader
+
+### Changes
+- Improve error handling in `build.go`.
+- Updated CRT Dr Venom Fast
+- Updated CRT Fast
+- Removed unused images from Gameboy shader
 
 ## [v1.2.0]
 ### Added
