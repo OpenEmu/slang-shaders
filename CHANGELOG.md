@@ -11,9 +11,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Added FidelityFX Super Res
   - AMD FidelityFX Super Resolution shader
--Added AMD FidelityFX Super Resolution shader with Subpixel Morphological Antialiasing
+- Added AMD FidelityFX Super Resolution shader with Subpixel Morphological Antialiasing
   - [What is Subpixel Morphological Antialiasing?](http://www.iryoku.com/smaa/)
--Added Technicolor film shader
+- Added Technicolor film shader
 
 ### Changes
 - Improve error handling in `build.go`.
