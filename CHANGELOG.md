@@ -5,8 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
-
+## [v1.4.0]
 ### Changes
 - Technicolor: Fix malformed configuration
 - Technicolor: Fix noise1 function clash
@@ -37,6 +36,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated CRT Fast, with improvements for rotated games.
 - Updated Go dependency to version 1.17.
 
-[Unreleased]: https://github.com/OpenEmu/slang-shaders/compare/v1.3.0...HEAD
+[Unreleased]: https://github.com/OpenEmu/slang-shaders/compare/v1.4.0...HEAD
+[v1.4.0]: https://github.com/OpenEmu/slang-shaders/compare/v1.3.0...v1.4.0
 [v1.3.0]: https://github.com/OpenEmu/slang-shaders/compare/v1.2.0...v1.3.0
 [v1.2.0]: https://github.com/OpenEmu/slang-shaders/compare/v1.1...v1.2.0
