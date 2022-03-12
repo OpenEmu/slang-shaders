@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changes
+- Technicolor: Fix malformed configuration
+- Technicolor: Fix noise1 function clash
+
 ## [v1.3.0]
 ### Added
 - Added FidelityFX Super Res

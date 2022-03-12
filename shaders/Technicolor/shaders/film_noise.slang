@@ -89,8 +89,8 @@ layout(location = 4) in float hash_num2;
 layout(location = 5) in float hash_num3;
 layout(location = 6) in float frame_hash;
 layout(location = 0) out vec4 FragColor;
-layout(set = 0, binding = 2) uniform sampler2D Source;
-layout(set = 0, binding = 3) uniform sampler2D noise1;
+layout(set = 0, binding = 1) uniform sampler2D Source;
+layout(set = 0, binding = 2) uniform sampler2D Noise1;
 
 //https://www.shadertoy.com/view/4sXSWs strength= 16.0
 float filmGrain(vec2 uv, float strength, float timer ){       
@@ -109,8 +109,8 @@ void main()
 	float vig = smoothstep(0.0, 1.0 - params.vig_amt, len);
 
 // create the noise/scratching effects from a LUT of actual film noise
-	vec4 film_noise1 = texture(noise1, noiseCoord.xx + (hash_num1 + hash_num3 - 0.85));
-	vec4 film_noise2 = texture(noise1, noiseCoord.xy + (hash_num1 + hash_num2 - 0.85));
+	vec4 film_noise1 = texture(Noise1, noiseCoord.xx + (hash_num1 + hash_num3 - 0.85));
+	vec4 film_noise2 = texture(Noise1, noiseCoord.xy + (hash_num1 + hash_num2 - 0.85));
 
 // set up color channel offsets / deconvergence
 	vec2 red_coord = (centerCoord + 0.01 * vec2(x_off_r, y_off_r)) + 0.5;
